@@ -50,7 +50,7 @@ const countries = [
   "Zambia", "Zimbabwe"
 ];
 
-export default function InstagramReferralForm({ reelSource = "Srinivas-Comment" }: { reelSource: string }) {
+export default function InstagramReferralForm({ reelSource = "AW2" }: { reelSource: string }) {
   const { toast } = useToast();
 
   const [formData, setFormData] = useState({
@@ -79,40 +79,63 @@ export default function InstagramReferralForm({ reelSource = "Srinivas-Comment" 
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
+  e.preventDefault();
+  setIsSubmitting(true);
 
-    const { firstName, lastName, email, phone, country, source } = formData;
+  const { firstName, lastName, email, phone, country, source } = formData;
 
-    if (!firstName || !lastName || !email || !phone || !country) {
-      toast({ title: 'Error', description: 'Please fill in all required fields.', variant: 'destructive' });
-      setIsSubmitting(false);
-      return;
-    }
-
-    const { error } = await supabase.from('leads').insert({
-      name: `${firstName} ${lastName}`,
-      phone: "+" + phone,
-      email,
-      city: country,
-      source,
-      status: 'New',
-      current_stage: 'Prospect',
-      created_at: new Date().toISOString(),
-      subscribed: 'no',
+  if (!firstName || !lastName || !email || !phone || !country) {
+    toast({
+      title: "Error",
+      description: "Please fill in all required fields.",
+      variant: "destructive",
     });
 
-    if (error) {
-      toast({ title: 'Error', description: 'Failed to submit. Try again.', variant: 'destructive' });
-    } else {
-      setShowSuccess(true);
-      setFormData({ firstName: '', lastName: '', email: '', phone: '', country: '', source });
-      setTimeout(() => setShowSuccess(false), 3000);
-    }
-
     setIsSubmitting(false);
-  };
+    return;
+  }
 
+  const { error } = await supabase.from("leads").insert({
+    name: `${firstName} ${lastName}`,
+    phone: "+" + phone,
+    email,
+    city: country,
+    source,
+    status: "New",
+    current_stage: "Prospect",
+    created_at: new Date().toISOString(),
+    subscribed: "no",
+  });
+
+  setIsSubmitting(false);
+
+  if (error) {
+    toast({
+      title: "Error",
+      description: "Failed to submit. Try again.",
+      variant: "destructive",
+    });
+    return;
+  }
+
+  // Show success animation
+  setShowSuccess(true);
+
+  // Clear form
+  setFormData({
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
+    country: "",
+    source: reelSource,
+  });
+
+  // Redirect after 2 seconds
+  setTimeout(() => {
+    window.location.href = "https://www.applywizz.ai";
+  }, 2000);
+};
   return (
     <div className="min-h-screen flex flex-col items-center justify-center px-4 py-6 space-y-4">
       <div className="text-center">
